@@ -13,7 +13,9 @@ import org.springframework.stereotype.Component;
 public class ClienteRepository {
     
     private List <Cliente> clientes;
-    
+    private int nextCode;
+    private int delCode;
+
     @PostConstruct
     public void criarClientes(){
         Cliente c1 = new Cliente();
@@ -35,6 +37,8 @@ public class ClienteRepository {
         c3.setEndereco("Rua Z, 99");
         c3.setSaldo(23.99);
 
+        nextCode = 4;
+        delCode = -1;
         clientes = new ArrayList<Cliente>();
         clientes.add(c1);
         clientes.add(c2);
@@ -55,9 +59,31 @@ public class ClienteRepository {
     }
 
     public Cliente save(Cliente cliente){
-
-        cliente.setCodigo(clientes.size()+1);
-        clientes.add(cliente);
+        if(delCode != -1){
+            cliente.setCodigo(delCode);
+            clientes.add(cliente);
+            delCode = -1;
+        }
+        else{
+            cliente.setCodigo(nextCode++);
+            clientes.add(cliente);
+        }
         return cliente;
     }
+
+	public void remove(Cliente cliente) {
+        delCode = cliente.getCodigo();
+        clientes.remove(cliente);
+    }
+
+	public Cliente update(Cliente cliente) {
+        Cliente aux = getClienteByCodigo(cliente.getCodigo());
+        
+        if(aux != null){
+            aux.setEndereco(cliente.getEndereco());
+            aux.setNome(cliente.getNome());
+            aux.setSaldo(cliente.getSaldo());
+        }
+        return aux;
+	}
 }
