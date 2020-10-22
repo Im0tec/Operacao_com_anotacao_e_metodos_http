@@ -1,10 +1,13 @@
 package com.example.cursorestfulspringboott4.controller;
 
-import java.net.URI;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
+import com.example.cursorestfulspringboott4.dto.ClienteDTO;
 import com.example.cursorestfulspringboott4.model.Cliente;
 import com.example.cursorestfulspringboott4.repository.ClienteRepository;
+import com.example.cursorestfulspringboott4.service.ClienteService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +19,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 
 @RestController
@@ -25,6 +30,9 @@ public class ClienteController {
 
     @Autowired
     private ClienteRepository repository;
+
+    @Autowired
+    private ClienteService service;
 
     @GetMapping()
     public List<Cliente> getClientes(){
@@ -45,12 +53,14 @@ public class ClienteController {
     }
 
     @PostMapping()
-    public ResponseEntity <Void> salvar(@RequestBody Cliente cliente){
+    public ResponseEntity <Void> salvar(@RequestBody ClienteDTO clienteDTO, HttpServletRequest request, UriComponentsBuilder builder){
+        
+        Cliente cliente = service.fromDTO(clienteDTO);
         cliente = repository.save(cliente);
+        
+        UriComponents uriComponents = builder.path(request.getRequestURI() + "/" + cliente.getCodigo()).build();
 
-        URI uri = URI.create("http://localhost:8080/clientes/" +  cliente.getCodigo());
-
-        return ResponseEntity.created(uri).build();
+        return ResponseEntity.created(uriComponents.toUri()).build();
     }
 
 
@@ -67,8 +77,9 @@ public class ClienteController {
         }
     }
     @PutMapping("/{codigo}")
-    public ResponseEntity <Cliente> atualizar(@PathVariable int codigo, @RequestBody Cliente cliente){
+    public ResponseEntity <Cliente> atualizar(@PathVariable int codigo, @RequestBody ClienteDTO clienteDTO){
 
+        Cliente cliente = service.fromDTO(clienteDTO);
         if(repository.getClienteByCodigo(codigo) != null){
             cliente.setCodigo(codigo);
             cliente = repository.update(cliente);
