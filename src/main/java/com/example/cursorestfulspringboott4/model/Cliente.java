@@ -1,12 +1,15 @@
 package com.example.cursorestfulspringboott4.model;
 
+import java.util.ArrayList;
+
 public class Cliente {
     
     private int codigo;
     private String nome;
     private String endereco;
     private double saldo;
-
+    private ArrayList<Pedido> pedidos = new ArrayList<Pedido>();
+    
     public int getCodigo() {
         return codigo;
     }
@@ -39,4 +42,34 @@ public class Cliente {
         this.saldo = saldo;
     }
     
+    public boolean addPedido(Pedido pedido) {
+        return pedidos.add(pedido);
+    }
+
+    public boolean removePedido(Pedido pedido) {
+        return pedidos.remove(pedido);
+    }
+
+    public double somaTotalPedidos() {
+        double soma = 0;
+
+        for (Pedido pedido : pedidos) {
+            soma += pedido.totalPedido();
+        }
+
+        return soma;
+    }
+
+    public double somaTotalPedidosFechados() {
+        double soma = 0;
+
+        for (Pedido pedido : pedidos) {
+            if (pedido.isPedidoFechado()) {
+                soma += pedido.totalPedido();
+            }
+        }
+
+        return soma;
+    }
+
 }

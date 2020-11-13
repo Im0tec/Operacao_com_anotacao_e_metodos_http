@@ -2,6 +2,7 @@ package com.example.cursorestfulspringboott4.repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 
@@ -49,13 +50,13 @@ public class ClienteRepository {
         return clientes;
     }
 
-    public Cliente getClienteByCodigo(int codigo){
+    public Optional<Cliente> getClienteByCodigo(int codigo){
         for(Cliente aux: clientes){
             if (aux.getCodigo() == codigo){
-                return aux;
+                return Optional.of(aux);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     public Cliente save(Cliente cliente){
@@ -77,7 +78,7 @@ public class ClienteRepository {
     }
 
 	public Cliente update(Cliente cliente) {
-        Cliente aux = getClienteByCodigo(cliente.getCodigo());
+        Cliente aux = getClienteByCodigo(cliente.getCodigo()).get();
         
         if(aux != null){
             aux.setEndereco(cliente.getEndereco());

@@ -6,7 +6,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.example.cursorestfulspringboott4.dto.ClienteDTO;
 import com.example.cursorestfulspringboott4.model.Cliente;
-import com.example.cursorestfulspringboott4.repository.ClienteRepository;
 import com.example.cursorestfulspringboott4.service.ClienteService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,66 +26,48 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequestMapping("/clientes")
 public class ClienteController {
 
-
-    @Autowired
-    private ClienteRepository repository;
-
     @Autowired
     private ClienteService service;
 
     @GetMapping()
     public List<Cliente> getClientes(){
-        return repository.getAllClientes();
+        return service.getAllClientes();
     }
 
 
     @GetMapping("/{codigo}")
     public ResponseEntity <Cliente> getClientes(@PathVariable int codigo){
-        Cliente cliente = repository.getClienteByCodigo(codigo);
+        Cliente cliente = service.getClienteByCodigo(codigo);
         
-        if(cliente != null){
-            return ResponseEntity.ok(cliente);
-        }
-        else{
-            return ResponseEntity.notFound().build();
-        }
+
+        return ResponseEntity.ok(cliente);
     }
 
     @PostMapping()
     public ResponseEntity <Void> salvar(@RequestBody ClienteDTO clienteDTO, HttpServletRequest request, UriComponentsBuilder builder){
         
         Cliente cliente = service.fromDTO(clienteDTO);
-        cliente = repository.save(cliente);
-        
+        cliente = service.save(cliente);
         UriComponents uriComponents = builder.path(request.getRequestURI() + "/" + cliente.getCodigo()).build();
-
+        
         return ResponseEntity.created(uriComponents.toUri()).build();
     }
 
 
     @DeleteMapping("/{codigo}")
     public ResponseEntity <Void> remover(@PathVariable int codigo){
-        Cliente cliente = repository.getClienteByCodigo(codigo);
-        
-        if(cliente != null){
-            repository.remove(cliente);
-            return ResponseEntity.noContent().build();
-        }
-        else{
-            return ResponseEntity.notFound().build();
-        }
+        service.removeByCodigo(codigo);
+        return ResponseEntity.noContent().build();        
     }
+
     @PutMapping("/{codigo}")
     public ResponseEntity <Cliente> atualizar(@PathVariable int codigo, @RequestBody ClienteDTO clienteDTO){
 
         Cliente cliente = service.fromDTO(clienteDTO);
-        if(repository.getClienteByCodigo(codigo) != null){
-            cliente.setCodigo(codigo);
-            cliente = repository.update(cliente);
-            return ResponseEntity.ok(cliente);
-        }
-        else{
-            return ResponseEntity.notFound().build();
-        }
+        
+        cliente.setCodigo(codigo);
+        cliente = service.update(cliente);
+        return ResponseEntity.ok(cliente);
+    
     }
 }
