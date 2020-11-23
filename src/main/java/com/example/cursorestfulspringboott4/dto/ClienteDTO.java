@@ -1,7 +1,17 @@
 package com.example.cursorestfulspringboott4.dto;
 
+import javax.validation.constraints.NotBlank;
+
+import org.hibernate.validator.constraints.Length;
+
 public class ClienteDTO {
+
+    @NotBlank(message = "Nome e´ obrigatorio!")
+    @Length(min=4, max=40, message = "Nome deve ter minimo de 4 e maximo de 40 caracteres!")
     private String nome;
+
+    @NotBlank(message = "Endereco e´ obrigatorio!")
+    @Length(min=4, max=40, message = "Endereco deve ter minimo de 4 e maximo de 40 caracteres!")
     private String endereco;
 
     public String getNome() {

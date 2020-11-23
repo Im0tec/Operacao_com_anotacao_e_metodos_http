@@ -3,10 +3,14 @@ package com.example.cursorestfulspringboott4.controller;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import com.example.cursorestfulspringboott4.dto.ClienteDTO;
+import com.example.cursorestfulspringboott4.dto.PedidoDTO;
 import com.example.cursorestfulspringboott4.model.Cliente;
+import com.example.cursorestfulspringboott4.model.Pedido;
 import com.example.cursorestfulspringboott4.service.ClienteService;
+import com.example.cursorestfulspringboott4.service.PedidoService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,27 +31,29 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class ClienteController {
 
     @Autowired
-    private ClienteService service;
+    private ClienteService clienteService;
+
+    @Autowired
+    private PedidoService pedidoService;
 
     @GetMapping()
     public List<Cliente> getClientes(){
-        return service.getAllClientes();
+        return clienteService.getAllClientes();
     }
 
 
     @GetMapping("/{codigo}")
     public ResponseEntity <Cliente> getClientes(@PathVariable int codigo){
-        Cliente cliente = service.getClienteByCodigo(codigo);
+        Cliente cliente = clienteService.getClienteByCodigo(codigo);
         
-
         return ResponseEntity.ok(cliente);
     }
 
     @PostMapping()
-    public ResponseEntity <Void> salvar(@RequestBody ClienteDTO clienteDTO, HttpServletRequest request, UriComponentsBuilder builder){
+    public ResponseEntity <Void> salvar(@Valid  @RequestBody ClienteDTO clienteDTO, HttpServletRequest request, UriComponentsBuilder builder){
         
-        Cliente cliente = service.fromDTO(clienteDTO);
-        cliente = service.save(cliente);
+        Cliente cliente = clienteService.fromDTO(clienteDTO);
+        cliente = clienteService.save(cliente);
         UriComponents uriComponents = builder.path(request.getRequestURI() + "/" + cliente.getCodigo()).build();
         
         return ResponseEntity.created(uriComponents.toUri()).build();
@@ -56,18 +62,37 @@ public class ClienteController {
 
     @DeleteMapping("/{codigo}")
     public ResponseEntity <Void> remover(@PathVariable int codigo){
-        service.removeByCodigo(codigo);
+        clienteService.removeByCodigo(codigo);
         return ResponseEntity.noContent().build();        
     }
 
     @PutMapping("/{codigo}")
     public ResponseEntity <Cliente> atualizar(@PathVariable int codigo, @RequestBody ClienteDTO clienteDTO){
 
-        Cliente cliente = service.fromDTO(clienteDTO);
+        Cliente cliente = clienteService.fromDTO(clienteDTO);
         
         cliente.setCodigo(codigo);
-        cliente = service.update(cliente);
+        cliente = clienteService.update(cliente);
         return ResponseEntity.ok(cliente);
     
     }
+
+    @PostMapping("{id}/pedidos")
+    public ResponseEntity<Void> salvar(@PathVariable int id, @RequestBody Pedido pedido, HttpServletRequest request, UriComponentsBuilder builder){
+        
+
+        pedido = pedidoService.salvar(pedido, id);
+        UriComponents uriComponents = builder.path(request.getRequestURI() + "/" + pedido.getNumero()).build();
+        
+        return ResponseEntity.created(uriComponents.toUri()).build();
+    }
+
+    @GetMapping("{id}/pedidos")
+    public List<PedidoDTO> GetPedidosCliente(@PathVariable int id){
+        
+        Cliente cliente = clienteService.getClienteByCodigo(id);
+
+        return pedidoService.toListDTO(cliente.getPedidos());
+    }
+
 }

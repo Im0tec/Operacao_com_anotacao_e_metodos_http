@@ -1,25 +1,17 @@
-package com.example.cursorestfulspringboott4.model;
+package com.example.cursorestfulspringboott4.dto;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
+import com.example.cursorestfulspringboott4.model.ItemPedido;
 
-public class Pedido {
-
+public class PedidoDTO {
     private long numero;
     private String descricao;
     private LocalDateTime dataPedido;
-    private Cliente cliente;
     private boolean pedidoFechado;
     private ArrayList<ItemPedido> itens = new ArrayList<ItemPedido>();
-
-    public Pedido() {
-    }
-    
-    public Pedido(long numero) {
-        this.numero = numero;
-    }
+    private double totalPedido;
 
     public long getNumero() {
         return numero;
@@ -45,14 +37,6 @@ public class Pedido {
     public void setDataPedido(LocalDateTime dataPedido) {
         this.dataPedido = dataPedido;
     }
-
-    public Cliente getCliente() {
-        return cliente;
-    }
-
-    public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
-    }
     
     public boolean isPedidoFechado() {
         return pedidoFechado;
@@ -60,12 +44,6 @@ public class Pedido {
 
     public void setPedidoFechado(boolean pedidoFechado) {
         this.pedidoFechado = pedidoFechado;
-    }
-
-    @Override
-    public String toString() {
-        return "Pedido [cliente=" + cliente.getCodigo() + ", dataPedido=" + dataPedido + ", descricao=" + descricao + ", numero="
-                + numero + "]";
     }
 
     public ArrayList<ItemPedido> getItens() {
@@ -80,14 +58,12 @@ public class Pedido {
         return itens.add(new ItemPedido(numero, preco, produto, quantidade));
     }
 
-    @JsonGetter
-    public double totalPedido() {
-        double total=0;
+    public double getTotalPedido() {
+        return totalPedido;
+    }
 
-        for(ItemPedido item: itens){
-            total += item.getTotalItem();
-        }
-        return total;
+    public void setTotalPedido(double totalPedido) {
+        this.totalPedido = totalPedido;
     }
 
 }
